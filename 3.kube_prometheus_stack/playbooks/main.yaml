@@ -8,5 +8,4 @@
   roles:
    - deploy_kube_prometheus_stack
    - expose_kube_prometheus_stack_on_intranet
-   - set_grafana_credentials
    - set_grafana_cluster_alerts

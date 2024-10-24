@@ -1,4 +1,25 @@
 ---
+- name: Ensure the Namespace exists
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    state: present
+    name: observability
+
+- name: Create Grafana Admin Secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: grafana-admin-secret
+        namespace: observability
+      type: Opaque
+      data:
+        admin-user: "{{ admin_user | b64encode }}"
+        admin-password: "{{ admin_password | b64encode }}"
+
 - name: Install Kube Prometheus Stack Chart
   kubernetes.core.helm:
     name: kube-prometheus-stack
@@ -9,5 +30,4 @@
     namespace: observability
     values_files:
       - "{{ role_path }}/files/kube-prometheus-stack/values.yaml"
-
 

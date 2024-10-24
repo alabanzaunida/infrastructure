@@ -1,0 +1,9 @@
+---
+- name: Install Twingate
+  hosts: localhost
+  vars_files:
+    - ../vars/vars.yaml
+
+  roles:
+    - install_twingate_operator
+    - deploy_twingate_connector

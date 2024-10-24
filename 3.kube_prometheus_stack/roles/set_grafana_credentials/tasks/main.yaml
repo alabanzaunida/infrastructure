@@ -1,0 +1,30 @@
+---
+- name: Update Grafana credentials in existing secret
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: kube-prometheus-stack-grafana
+        namespace: observability
+      data:
+        admin-user: "{{ grafana_credentials.admin_user | b64encode }}"
+        admin-password: "{{ grafana_credentials.admin_password | b64encode }}"
+    merge_type: strategic-merge
+
+
+- name: Restart Grafana pod to apply new credentials
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    state: absent
+    kind: Pod
+    namespace: observability
+    label_selectors:
+      - "app.kubernetes.io/name=grafana"
+
+- name: Wait to Grafana pod be restarted
+  pause:
+    seconds: 60
+

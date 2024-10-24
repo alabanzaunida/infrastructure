@@ -1,0 +1,11 @@
+---
+- name: Install Cert Manager Chart
+  kubernetes.core.helm:
+    name: cert-manager
+    chart_ref: "{{ role_path }}/files/cert-manager"
+    create_namespace: true
+    release_state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    namespace: cert-manager
+    values_files:
+      - "{{ role_path }}/files/cert-manager/values.yaml"

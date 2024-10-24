@@ -1,0 +1,30 @@
+- name: Apply Harbor TwingateResource
+  k8s:
+    state: present
+    definition:
+      apiVersion: twingate.com/v1beta
+      kind: TwingateResource
+      metadata:
+        name: harbor
+        namespace: "{{ harbor_namespace }}"
+      spec:
+        name: Harbor
+        address: harbor.harbor.svc.cluster.local
+        alias: "{{ harbor_domain }}"
+
+- name: Apply Harbor TwingateResourceAccess
+  k8s:
+    state: present
+    definition:
+      apiVersion: twingate.com/v1beta
+      kind: TwingateResourceAccess
+      metadata:
+        name: harbor
+        namespace: "{{ harbor_namespace }}"
+      spec:
+        resourceRef:
+          name: harbor
+          namespace: "{{ harbor_namespace }}"
+        principalId: "{{ principal_id }}"
+        securityPolicyId: "{{ security_id }}"
+

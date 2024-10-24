@@ -1,0 +1,12 @@
+- name: Install Harbor chart from local path
+  kubernetes.core.helm:
+    name: harbor
+    chart_ref: "{{ role_path }}/files/harbor"
+    namespace: harbor
+    create_namespace: true
+    release_state: present
+    values_files:
+      - "{{ role_path }}/files/harbor/values.yaml"
+    values:
+      harborAdminPassword: "{{ admin_password }}"
+    kubeconfig: "{{ kubeconfig_path }}"

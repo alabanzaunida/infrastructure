@@ -1,0 +1,11 @@
+- name: Install monitoring proxy chart
+  kubernetes.core.helm:
+    name: monitoring-proxy
+    chart_ref: "{{ role_path }}/files/deploy_monitoring_proxy_and_expose_on_intranet"
+    create_namespace: true
+    release_state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    namespace: observability
+    values_files:
+      - "{{ role_path }}/files/deploy_monitoring_proxy_and_expose_on_intranet/values.yaml"
+      - "{{ role_path }}/files/deploy_monitoring_proxy_and_expose_on_intranet/secret-values.yaml"

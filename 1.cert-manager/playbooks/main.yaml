@@ -1,0 +1,12 @@
+---
+- name: Install and Setup Cert-Manager
+  hosts: localhost
+  become: yes
+  vars_files:
+    - ../vars/vars.yaml
+
+  roles:
+    - create_intranet_cluster_issuer
+    - install_cert_manager
+    - create_internet_cluster_issuer
+

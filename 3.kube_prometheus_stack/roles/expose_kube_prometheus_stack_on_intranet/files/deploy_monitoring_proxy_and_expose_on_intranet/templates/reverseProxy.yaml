@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-tls-proxy
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-tls-proxy
+  template:
+    metadata:
+      labels:
+        app: nginx-tls-proxy
+    spec:
+      initContainers:
+      - name: wait-for-cert
+        image: alpine:latest
+        command:
+          - sh
+          - -c
+          - |
+            echo "Waiting for the intranet-cert secret to be available..."
+            while [ ! -f /etc/nginx/ssl/tls.crt ] || [ ! -f /etc/nginx/ssl/tls.key ]; do
+              echo "Certificate not found, waiting 5 seconds..."
+              sleep 5
+            done
+            echo "Certificate found, starting NGINX."
+        volumeMounts:
+        - name: grafana-tls
+          mountPath: /etc/nginx/ssl
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 443
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: grafana-tls
+          mountPath: /etc/nginx/ssl
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-config
+      - name: grafana-tls
+        secret:
+          secretName: intranet-cert
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: {{ .Values.namespace }}
+data:
+  nginx.conf: |
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      {{- range .Values.resources }}
+      server {
+        listen 443 ssl;
+        server_name {{ .alias }};
+
+        ssl_certificate /etc/nginx/ssl/tls.crt;
+        ssl_certificate_key /etc/nginx/ssl/tls.key;
+
+        location / {
+          proxy_pass http://{{ .backend_svc_url }}:{{ .backend_port }};
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        }
+      }
+      {{- end }}
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-tls-proxy
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: nginx-tls-proxy
+  ports:
+    - port: 443
+      targetPort: 443
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: monitor-cert
+  namespace: {{ .Values.namespace }}
+spec:
+  secretName: intranet-cert
+  issuerRef:
+    name: intranet
+    kind: ClusterIssuer
+  dnsNames:
+    {{- range .Values.resources }}
+    - {{ .alias }}
+    {{- end }}

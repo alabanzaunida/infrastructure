@@ -1,0 +1,13 @@
+---
+- name: Install Kube Prometheus Stack Chart
+  kubernetes.core.helm:
+    name: kube-prometheus-stack
+    chart_ref: "{{ role_path }}/files/kube-prometheus-stack"
+    create_namespace: true
+    release_state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    namespace: observability
+    values_files:
+      - "{{ role_path }}/files/kube-prometheus-stack/values.yaml"
+
+

@@ -1,0 +1,17 @@
+# roles/twingate_connector/tasks/main.yaml
+---
+- name: Create TwingateConnector
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: twingate.com/v1beta
+      kind: TwingateConnector
+      metadata:
+        name: twingate-connector
+        namespace: twingate
+      spec:
+        imagePolicy:
+          schedule: "0 0 * * *"
+          provider: "dockerhub"
+        name: twingate-connector
+        hasStatusNotificationsEnabled: false

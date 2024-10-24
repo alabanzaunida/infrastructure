@@ -1,0 +1,2 @@
+certs_path: "{{ playbook_dir }}/../certs"
+kubeconfig_path: "/var/snap/microk8s/current/credentials/client.config"

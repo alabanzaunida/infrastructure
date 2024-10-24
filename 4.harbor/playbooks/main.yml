@@ -1,0 +1,10 @@
+---
+- name: Set up Harbor environment
+  hosts: localhost
+  vars_files:
+    - ../vars/secret-vars.yaml
+    - ../vars/vars.yaml
+  roles:
+    - create_ns_and_cert
+    - install_harbor
+    - expose_harbor_on_intranet

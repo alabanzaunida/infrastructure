@@ -1,0 +1,5 @@
+*secret-vars.yaml
+*secret-values.yaml
+*secrets.tfvars
+*.crt
+*.key

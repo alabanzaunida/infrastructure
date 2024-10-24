@@ -1,0 +1,44 @@
+###
+# Root key for Operator Helm Chart
+operator:
+  ###
+  # An array of environment variables to pass to the Operator deployment.
+  # Pass an empty array to start Operator with defaults.
+  env:
+    - name: OPERATOR_STS_ENABLED
+      value: "on"
+  ###
+  # Specify the Operator container image to use for the deployment.
+  image:
+    repository: quay.io/minio/operator
+    tag: v6.0.2
+    pullPolicy: IfNotPresent
+  ###
+  # The number of Operator pods to deploy.
+  replicaCount: 2
+  ###
+  # The Kubernetes SecurityContext to use for deploying Operator resources.
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+  ###
+  # The Kubernetes SecurityContext to use for deploying Operator containers.
+  containerSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+  ###
+  # The Requests or Limits for resources to associate to Operator pods.
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+      ephemeral-storage: 500Mi

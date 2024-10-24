@@ -1,0 +1,26 @@
+resources:
+  - name: grafana
+    resource_name: Grafana
+    alias: intra.grafana.com
+    backend_svc_url: kube-prometheus-stack-grafana.observability.svc.cluster.local
+    backend_port: 80
+    frontend_svc_url: nginx-tls-proxy.observability.svc.cluster.local
+    frontend_port: 443
+
+  - name: alert-manager
+    resource_name: Alert Manager
+    alias: intra.alert-manager.com
+    backend_svc_url: kube-prometheus-stack-alertmanager.observability.svc.cluster.local
+    backend_port: 9093
+    frontend_svc_url: nginx-tls-proxy.observability.svc.cluster.local
+    frontend_port: 443
+
+  - name: prometheus
+    resource_name: Prometheus
+    alias: intra.prometheus.com
+    backend_svc_url: kube-prometheus-stack-prometheus.observability.svc.cluster.local
+    backend_port: 9090
+    frontend_svc_url: nginx-tls-proxy.observability.svc.cluster.local
+    frontend_port: 443
+
+namespace: observability

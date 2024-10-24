@@ -1,0 +1,14 @@
+{{- range .Values.resources }}
+apiVersion: twingate.com/v1beta
+kind: TwingateResourceAccess
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+spec:
+  resourceRef:
+    name: {{ .name }}
+    namespace: {{ $.Values.namespace }}
+  principalId: "{{ $.Values.twingate_credentials.principal_id }}"
+  securityPolicyId: "{{ $.Values.twingate_credentials.security_policy_id }}"
+---
+{{- end }}

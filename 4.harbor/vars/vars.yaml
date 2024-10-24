@@ -1,0 +1,4 @@
+---
+kubeconfig_path: "/var/snap/microk8s/current/credentials/client.config"
+harbor_domain: "intra.harbor.com"
+harbor_namespace: "harbor"

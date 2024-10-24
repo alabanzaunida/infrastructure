@@ -1,0 +1,19 @@
+- name: Create Internet ClusterIssuer
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig_path }}"
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: internet
+      spec:
+        acme:
+          server: https://acme-v02.api.letsencrypt.org/directory
+          email: alabanza.iglesia.unida@gmail.com
+          privateKeySecretRef:
+            name: letsencrypt-microk8s
+          solvers:
+            - http01:
+                ingress:
+                  class: public

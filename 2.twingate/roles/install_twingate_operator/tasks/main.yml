@@ -1,0 +1,11 @@
+- name: Install Operator Chart
+  kubernetes.core.helm:
+    name: twingate-operator
+    chart_ref: "{{ role_path }}/files/twingate-operator"
+    create_namespace: true
+    release_state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    namespace: twingate
+    values_files:
+      - "{{ role_path }}/files/twingate-operator/secret-values.yaml"
+      - "{{ role_path }}/files/twingate-operator/values.yaml"

@@ -1,0 +1,23 @@
+- name: Open port-forward
+  command: "{{ role_path }}/files/port-forward/open.sh"
+
+- name: Wait to open port-forward
+  pause:
+    seconds: 5
+
+
+- name: Apply Terraform configuration with logs
+  community.general.terraform:
+    project_path: "{{ role_path }}/files/terraform"
+    variables_files:
+      - "{{ role_path }}/files/terraform/secrets.tfvars"
+    state: present
+    force_init: yes
+  register: terraform_output
+
+- name: Display Terraform logs
+  ansible.builtin.debug:
+    var: terraform_output.stdout
+
+- name: Close port-forward
+  command: "{{ role_path }}/files/port-forward/close.sh"

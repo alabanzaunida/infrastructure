@@ -1,0 +1,11 @@
+- name: Uninstall Harbor chart
+  community.kubernetes.helm:
+    name: harbor
+    namespace: harbor
+    release_state: absent
+    kubeconfig: /var/snap/microk8s/current/credentials/client.config
+
+- name: Remove Harbor Helm repo
+  community.kubernetes.helm_repository:
+    name: harbor
+    state: absent

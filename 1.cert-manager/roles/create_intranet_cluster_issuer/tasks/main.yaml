@@ -1,0 +1,36 @@
+---
+- name: Convert CA certificate to base64
+  command: "base64 -w 0 {{ certs_path }}/intranet.crt"
+  register: ca_crt_base64
+
+- name: Convert CA key to base64
+  command: "base64 -w 0 {{ certs_path }}/intranet.key"
+  register: ca_key_base64
+
+- name: Create Kubernetes secret with CA cert and key
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: intranet-cert
+        namespace: cert-manager
+      type: Opaque
+      data:
+        tls.crt: "{{ ca_crt_base64.stdout }}"
+        tls.key: "{{ ca_key_base64.stdout }}"
+
+- name: Create ClusterIssuer in Kubernetes
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: intranet
+      spec:
+        ca:
+          secretName: intranet-cert

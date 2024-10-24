@@ -1,0 +1,37 @@
+---
+- name: Ensure the Namespace exists
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    state: present
+    name: "{{ harbor_namespace }}"
+
+- name: Create Minio Certificate
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: minio-tls
+        namespace: "{{ minio_namespace }}"
+      spec:
+        secretName: intranet-cert
+        issuerRef:
+          name: intranet
+          kind: ClusterIssuer
+        dnsNames:
+          - "{{ minio_domain }}"
+
+- name: Install Minio Tenant using Helm
+  kubernetes.core.helm:
+    name: minio
+    chart_ref: "{{ role_path }}/files/tenant"
+    namespace: "{{ minio_namespace }}"
+    create_namespace: true
+    release_state: present
+    values_files:
+      - "{{ role_path }}/files/tenant/values.yaml"
+    values:
+      tenantName: "{{ tenant_name }}"
+    kubeconfig: "{{ kubeconfig_path }}"

@@ -1,0 +1,11 @@
+---
+- name: Install Minio Operator
+  kubernetes.core.helm:
+    name: minio-operator
+    chart_ref: "{{ role_path }}/files/operator"
+    namespace: minio
+    create_namespace: true
+    release_state: present
+    values_files:
+      - "{{ role_path }}/files/operator/values.yaml"
+    kubeconfig: "{{ kubeconfig_path }}"

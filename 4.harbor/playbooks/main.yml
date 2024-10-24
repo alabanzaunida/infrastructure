@@ -1,10 +1,9 @@
 ---
-- name: Set up Harbor environment
+- name: Install Harbor on microk8s
   hosts: localhost
   vars_files:
     - ../vars/secret-vars.yaml
     - ../vars/vars.yaml
   roles:
-    - create_ns_and_cert
     - install_harbor
     - expose_harbor_on_intranet

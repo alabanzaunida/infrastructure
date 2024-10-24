@@ -1,12 +1,47 @@
-- name: Install Harbor chart from local path
+- name: Ensure the Namespace exists
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    state: present
+    name: "{{ harbor_namespace }}"
+
+- name: Create Harbor Certificate
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: harbor-tls
+        namespace: "{{ harbor_namespace }}"
+      spec:
+        secretName: intranet-cert
+        issuerRef:
+          name: intranet
+          kind: ClusterIssuer
+        dnsNames:
+          - "{{ harbor_domain }}"
+
+- name: Create admin password secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: harbor-admin-secret
+        namespace: harbor
+      type: Opaque
+      data:
+        HARBOR_ADMIN_PASSWORD: "{{ admin_password | b64encode }}"
+
+- name: Install Harbor chart
   kubernetes.core.helm:
     name: harbor
     chart_ref: "{{ role_path }}/files/harbor"
-    namespace: harbor
     create_namespace: true
     release_state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    namespace: harbor
     values_files:
       - "{{ role_path }}/files/harbor/values.yaml"
-    values:
-      harborAdminPassword: "{{ admin_password }}"
-    kubeconfig: "{{ kubeconfig_path }}"
